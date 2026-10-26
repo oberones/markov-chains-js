@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#10121e">
+  <meta name="description" content="Follow a little chance into a new musical universe. An interactive Markov-chain music toy, made for curious ears.">
+  <title>Markov Playground — follow the unexpected</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./src/app/style.css">
+</head>
+<body>
+  <a class="skip" href="#play-button">Skip to the instrument</a>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Markov Playground home"><span class="brand-symbol" aria-hidden="true">✳</span><span>markov<span class="brand-light">playground</span></span></a>
+      <span class="top-note">A LITTLE MUSIC. A LITTLE CHANCE.</span>
+      <a class="quiet-link" href="#learn">How it works <span aria-hidden="true">↗</span></a>
+    </header>
+    <main>
+      <section class="intro" aria-labelledby="headline">
+        <div><p class="eyebrow"><span class="tiny-dot"></span> AN INSTRUMENT FOR CURIOUS EARS</p><h1 id="headline">Follow the <em>unexpected.</em></h1><p class="intro-copy">A sound leads to another. Then somewhere new.<br>Make a little universe of music. No right notes required.</p></div>
+        <div class="intro-orbit" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><i></i><b>∞</b><span>LET CHANCE PLAY</span></div>
+      </section>
+      <section aria-label="Starting worlds" class="worlds" id="worlds"></section>
+      <div id="status" class="status" role="status" aria-live="polite">Choose a world, then press Play. Everything happens on your device.</div>
+      <div class="instrument-grid">
+        <div class="main-instrument">
+          <section class="constellation panel" aria-labelledby="constellation-title">
+            <div class="panel-heading"><div><p class="eyebrow" id="constellation-title">YOUR SOUND CONSTELLATION</p><h2 id="source-name">Slow orbit</h2></div><span class="mode-badge" id="mode-badge"><span class="tiny-dot"></span> READY TO WANDER</span></div>
+            <div class="transport"><button class="button primary" id="play-button"><span aria-hidden="true">▶</span> Play</button><button class="button" id="freeze-button" disabled><span aria-hidden="true">❄</span> Freeze</button><button class="button ghost" id="journey-button"><span aria-hidden="true">↻</span> New journey</button></div>
+            <div class="graph-stage"><svg id="graph" viewBox="0 0 760 430" role="group" aria-label="Sound constellation. Select a sound to inspect its connections."></svg><div class="graph-hint">Each light is a sound. Each path is a possibility.</div></div>
+            <div class="graph-footer"><span id="graph-count">0 sounds · 0 paths</span><span id="heard-count">0 sounds explored</span></div>
+            <div class="trail-row"><span class="eyebrow">THE PATH SO FAR</span><div id="trail" class="trail" aria-hidden="true"></div><span id="now-playing" class="now-playing">Your journey starts with a click.</span></div>
+          </section>
+          <section class="panel connections" aria-labelledby="connections-title">
+            <div class="section-heading"><div><p class="eyebrow">PULL A THREAD</p><h2 id="connections-title">What happens next?</h2></div><button class="text-button" id="reset-button">Reset chances ↺</button></div>
+            <p class="muted small">Choose a sound to explore its possibilities. Move a weight to give a path more or less chance.</p>
+            <div class="state-tools"><label class="sr-only" for="state-search">Find a sound</label><input id="state-search" type="search" placeholder="Find a sound…" autocomplete="off"><label class="sr-only" for="state-select">Selected sound</label><select id="state-select"></select><button class="button small-button" id="audition-button">Hear it ♫</button></div>
+            <p class="small muted" id="selected-summary"></p><div class="destination-tools"><label class="sr-only" for="connection-search">Find a next sound</label><input id="connection-search" type="search" placeholder="Find a next sound…"><span id="connection-count" class="small muted"></span></div><div id="connections-list" class="connections-list"></div>
+            <p class="model-note" id="model-note">As learned · each choice depends only on the current sound.</p>
+          </section>
+        </div>
+        <aside class="side-instrument" aria-label="Shape your journey">
+          <section class="panel controls">
+            <p class="eyebrow">MAKE IT YOURS</p><h2>Shape the journey</h2>
+            <label class="field-label" for="sound-select">Sound <span>A different kind of glow</span></label>
+            <select id="sound-select"><option value="warm">◌ Warm clouds</option><option value="glassy">◇ Glass lanterns</option><option value="organ">≋ Velvet organ</option><option value="dark">◒ Midnight pulse</option><option value="shimmer">✧ Stardust shimmer</option></select>
+            <div class="control"><label for="tempo">Speed <output id="tempo-value" for="tempo">96 BPM</output></label><input id="tempo" type="range" min="30" max="240" value="96" step="1"><div class="range-ends"><span>Unhurried</span><span>Restless</span></div></div>
+            <div class="control"><label for="temperature">Surprise <output id="temperature-value" for="temperature">As learned</output></label><input id="temperature" type="range" min="0.5" max="2" value="1" step="0.05"><div class="range-ends"><span>Familiar</span><span>Unexpected</span></div><p class="control-help">Explore quieter paths. The sounds stay in your universe.</p></div>
+            <div class="control"><label for="volume">Volume <output id="volume-value" for="volume">65%</output></label><input id="volume" type="range" min="0" max="1" value="0.65" step="0.01"></div>
+            <details class="seed-details"><summary>A repeatable little accident</summary><label class="field-label" for="seed">Journey seed</label><div class="seed-row"><input id="seed" value="slow-orbit-01" maxlength="128" autocomplete="off"><button class="button small-button" id="seed-button">Use seed</button></div><p class="control-help">The same seed, source, and chances start the same journey.</p></details>
+          </section>
+          <section class="panel keep-panel" aria-labelledby="keep-title"><div class="section-heading"><h2 id="keep-title">Bottle a moment</h2><span class="bottle-star" aria-hidden="true">✧</span></div><p class="muted small">Love where you landed? Freeze a stretch of the path and make it yours.</p><label class="field-label" for="freeze-count">Capture the last</label><select id="freeze-count"><option value="8">8 sounds · a little thought</option><option value="16" selected>16 sounds · a small journey</option><option value="32">32 sounds · a longer wander</option></select><p id="clip-info" class="clip-info">No moment bottled yet.</p><div class="export-buttons"><button class="button" id="wav-button" disabled>↓ WAV audio</button><button class="button" id="midi-button" disabled>↓ MIDI notes</button></div><p class="control-help">One frozen phrase, with your current speed and sound. WAV includes the fading tail.</p></section>
+        </aside>
+      </div>
+      <div class="utility-grid">
+        <section class="panel utility" aria-labelledby="import-title"><p class="eyebrow">BRING A LITTLE INSPIRATION</p><h2 id="import-title">Your music, new possibilities.</h2><p class="muted small">Let the playground learn from a score or MIDI file. Choose one part and hear the sounds it learns.</p><label class="upload-zone" id="music-file-label" tabindex="0" role="button" for="music-file"><span aria-hidden="true">↥</span><strong>Choose a musical starting point</strong><span>MusicXML, MXL, or MIDI · up to 5 MiB</span></label><input id="music-file" class="sr-only" type="file" tabindex="-1" accept=".musicxml,.xml,.mxl,.mid,.midi"><div id="import-options" hidden><label class="field-label" for="part-select">Choose a part</label><select id="part-select"></select><div class="import-actions"><button class="button" id="preview-button">Hear the training sounds</button><button class="button primary" id="use-import-button">Explore this part</button></div><p id="import-summary" class="small muted"></p></div><p class="privacy-note"><span aria-hidden="true">◈</span> Your files stay on your device.</p></section>
+        <section class="panel utility" aria-labelledby="library-title"><p class="eyebrow">SOMETHING TO COME BACK TO</p><h2 id="library-title">A shelf of tiny universes.</h2><p class="muted small">Save the sounds, chances, and frozen moment. Reopen them here, or take a toy file with you.</p><label class="sr-only" for="toy-name">Name your toy</label><div class="save-row"><input id="toy-name" maxlength="100" value="My slow orbit" placeholder="Name your universe"><button class="button" id="save-button">Save here</button></div><div class="portable-row"><button class="text-button" id="download-toy-button">↓ Download toy</button><label class="text-button" for="toy-file" tabindex="0" id="toy-file-label">↑ Open toy file</label><input id="toy-file" type="file" class="sr-only" accept=".json"></div><div id="library-list" class="library-list"><p class="small muted">Your saved worlds will appear here.</p></div><p class="control-help">Browser saves stay in this browser. Download a toy to keep a portable copy.</p></section>
+      </div>
+      <section id="learn" class="learn panel"><details><summary><div><p class="eyebrow">BEHIND THE LITTLE LIGHTS</p><h2>Music with a one-sound memory.</h2></div><span class="learn-plus" aria-hidden="true">+</span></summary><div class="learn-content"><div><span class="lesson-number">01</span><h3>A sound becomes a place</h3><p>Each light is a note, a chord, or a silence with a particular length. The same notes held for a different length become a different place.</p></div><div><span class="lesson-number">02</span><h3>Listening makes the paths</h3><p>The playground counts which sounds follow each other in a source. If a sound went to one neighbor three times and another once, their chances are 75% and 25%.</p></div><div><span class="lesson-number">03</span><h3>Chance takes a walk</h3><p>A seeded random draw picks a path. Only the current sound matters to the next choice. That is the Markov principle: a one-sound memory, with room for surprise.</p></div><div class="lesson-footnote"><p>The first sound is drawn from how often sounds appeared in the source. A one-beat rest connects the end back to the beginning. Those added paths keep the walk going; they do not change starting frequencies.</p><p>Surprise and your edits reshape the learned chances. Freezing repeats a captured walk instead of making new choices. Imported overlapping notes become chord snapshots; held notes can sound again when another note changes.</p><p>Inspired by Ilana Shapiro and Mark Huber, <a href="https://scholarship.claremont.edu/jhm/vol11/iss2/8/" target="_blank" rel="noreferrer">Markov Chains for Computer Music Generation</a> (2021). The built-in motifs and synthesizer were created for this playground.</p></div></div></details></section>
+    </main>
+    <footer><a class="brand" href="./"><span class="brand-symbol" aria-hidden="true">✳</span>markov playground</a><span>Made of sound, silence, and possibility.</span><a href="./THIRD_PARTY_NOTICES.txt" target="_blank">Credits & notices ↗</a></footer>
+  </div>
+  <script type="module" src="./src/app/main.js"></script>
+</body>
+</html>

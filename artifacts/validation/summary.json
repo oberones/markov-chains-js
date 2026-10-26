@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-25",
+  "application": "Markov Playground",
+  "unit_tests": {
+    "passed": 58,
+    "failed": 0,
+    "report": "unit-tests.txt"
+  },
+  "browser_tests": {
+    "browser": "Chromium",
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0,
+    "report": "browser-results.json"
+  },
+  "production_build": {
+    "status": "passed",
+    "directory": "../../dist",
+    "report": "build.txt"
+  },
+  "visual_checks": [
+    "Desktop 1440x1000",
+    "Narrow layout 390x844",
+    "Reduced motion",
+    "Keyboard graph selection",
+    "Native app browser playback/stop UI"
+  ],
+  "screenshots": [
+    "desktop.png",
+    "mobile.png",
+    "preview.png"
+  ],
+  "unverified": [
+    "Human listening assessment",
+    "Physical mobile-device audio and performance",
+    "Safari and Firefox",
+    "Hosted deployment"
+  ],
+  "source_pdf": "../../Markov Chains for Computer Music Generation.pdf"
+}

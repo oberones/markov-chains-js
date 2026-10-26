@@ -1,0 +1,13 @@
+# Include inside the existing HTTPS server block of the front proxy.
+# The proxy must share the external web-backend Docker network.
+location = /apps/markov-playground-js {
+    return 308 /apps/markov-playground-js/;
+}
+
+location /apps/markov-playground-js/ {
+    # Trailing slash strips the prefix; use the service's internal port.
+    proxy_pass http://markov-playground-js:8080/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}

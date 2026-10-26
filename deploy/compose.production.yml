@@ -1,0 +1,35 @@
+name: markov-playground-js
+
+services:
+  markov-playground-js:
+    image: ghcr.io/oberones/markov-playground-js:latest
+    container_name: markov-playground-js
+    # Matches the platform published by CI; ARM hosts need AMD64 emulation.
+    platform: linux/amd64
+    restart: unless-stopped
+    user: "101:101"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+    pids_limit: 64
+    mem_limit: 128m
+    cpus: 1.0
+    ports:
+      - "127.0.0.1:${MARKOV_PORT:-8091}:8080"
+    networks:
+      - web-backend
+    # Health check is inherited from the image. All user data stays in browsers.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  web-backend:
+    name: web-backend
+    external: true

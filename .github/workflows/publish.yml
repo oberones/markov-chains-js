@@ -1,0 +1,132 @@
+name: Verify and publish container
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    # Trigger filters are globs; the release script validates full SemVer.
+    tags: ['[0-9]*.[0-9]*.[0-9]*', 'v[0-9]*.[0-9]*.[0-9]*']
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    name: Unit tests and browser checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      image: ${{ steps.release.outputs.image }}
+      tags: ${{ steps.release.outputs.tags }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.21.0'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Run unit tests
+        run: npm test
+      - name: Validate release metadata
+        id: release
+        run: node scripts/release-metadata.mjs
+      - name: Build static application
+        run: npm run build
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run browser suite
+        run: npm run test:browser
+
+  container:
+    name: Build and smoke test linux/amd64 container
+    # Independent of verify: every PR attempts a build even if unit tests fail.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js for HTTP checks
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build verification image without publishing
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          push: false
+          tags: markov-playground-js:verify
+          cache-from: type=gha,scope=markov-playground-js-amd64
+          cache-to: type=gha,mode=max,scope=markov-playground-js-amd64
+      - name: Verify production Compose health and HTTP behavior
+        run: bash scripts/container-smoke.sh markov-playground-js:verify
+
+  publish:
+    name: Publish verified release to GHCR
+    needs: [verify, container]
+    if: >-
+      github.event_name == 'push' && github.ref_type == 'tag' &&
+      github.repository == 'oberones/markov-chains-js' &&
+      needs.verify.outputs.version != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    concurrency:
+      group: markov-playground-js-ghcr-publish
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out verified source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Log in to GHCR
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish tagged source
+        id: image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ needs.verify.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ needs.verify.outputs.version }}
+          cache-from: type=gha,scope=markov-playground-js-amd64
+          cache-to: type=gha,mode=max,scope=markov-playground-js-amd64
+      - name: Report published image
+        env:
+          IMAGE: ${{ needs.verify.outputs.image }}
+          TAGS: ${{ needs.verify.outputs.tags }}
+          DIGEST: ${{ steps.image.outputs.digest }}
+        run: |
+          {
+            printf '### Published container\n\nPlatform: `linux/amd64`\n\n'
+            printf 'Tags:\n```text\n%s\n```\n\n' "$TAGS"
+            printf 'Immutable image: `%s@%s`\n' "$IMAGE" "$DIGEST"
+          } >> "$GITHUB_STEP_SUMMARY"

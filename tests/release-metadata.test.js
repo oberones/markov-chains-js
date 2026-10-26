@@ -4,7 +4,7 @@ import { releaseMetadata } from '../scripts/release-metadata.mjs';
 
 const input = {
   event: 'push', refType: 'tag', tag: '0.2.0', packageVersion: '0.2.0',
-  repository: 'Oberones/markov-chains-js', sha: 'a'.repeat(40)
+  repository: 'Oberones/markov-playground-js', sha: 'a'.repeat(40)
 };
 
 test('only tag pushes produce publication metadata', () => {

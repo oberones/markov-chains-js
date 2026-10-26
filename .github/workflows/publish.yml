@@ -82,7 +82,7 @@ jobs:
     needs: [verify, container]
     if: >-
       github.event_name == 'push' && github.ref_type == 'tag' &&
-      github.repository == 'oberones/markov-chains-js' &&
+      github.repository == 'oberones/markov-playground-js' &&
       needs.verify.outputs.version != ''
     runs-on: ubuntu-24.04
     timeout-minutes: 25

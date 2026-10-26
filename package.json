@@ -1,6 +1,6 @@
 {
   "name": "markov-playground",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "A cosmic playground for music, memory, and chance.",
@@ -20,5 +20,7 @@
     "@playwright/test": "1.64.1",
     "vite": "8.3.5"
   },
-  "engines": {"node": ">=22.12.0"}
+  "engines": {
+    "node": ">=22.12.0"
+  }
 }
